@@ -1,0 +1,138 @@
+GET http://localhost:3001/api/blogs/
+
+###
+
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Njc3ODNkYzg3NTAzMjY3NzNiOTI5OSIsImlhdCI6MTcwMTMwODQxOX0.Agi3m1UxuA_oK025FXtDWvTvPXOa5-wKV_NJHiaf6GU
+
+{
+    "title": "Blog about sports",
+    "author": "Michael Jordan",
+    "url": "blog.com",
+    "likes": 3,
+    "userId": "6567783dc8750326773b9299"
+
+}
+
+###
+
+
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Njc3ODNkYzg3NTAzMjY3NzNiOTI5OSIsImlhdCI6MTcwMTMxMTM1OH0.w1L8vBqALPibSvZRZMvAN7dDlQdBycFzkoptlKY4X-U
+
+{
+    "title": "alberso blog123",
+    "author": "Michael Jordan",
+    "url": "blog.com",
+    "likes": 3,
+    "userId": "6565ff39521eb22fa11bc034"
+}
+
+
+####
+
+
+
+
+
+###
+
+GET http://localhost:3001/api/users
+
+
+
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+
+{
+  "userName": "usuario",
+  "name": "Borges",
+  "password": "password"
+  
+}
+
+
+###
+
+DELETE http://localhost:3001/api/blogs/656948ac3950b6d2a907f802
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Njc3ODNkYzg3NTAzMjY3NzNiOTI5OSIsImlhdCI6MTcwMTQzOTY1Mn0.nLFq3UaVJF3JLpHJ-2L0mJC5O881C0FNV3_n2JSqAes
+
+{
+  "user": "6567783dc8750326773b9299"
+}
+
+###
+PUT http://localhost:3001/api/blogs/655649d69c5c4a796d49b2f8
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+{
+    "title": "Blog about sports",
+    "author": "Michael Jordan",
+    "url": "blog.com",
+    "likes": 80
+}
+
+
+
+
+
+###
+
+
+
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "rodrigo",
+  "password": "password"
+  
+}
+
+
+###
+blogsRouter.delete('/api/blogs/:id', async (request, response) => {
+  await Blog.findByIdAndRemove(request.params.id)
+  response.status(204).end()
+})
+
+blogsRouter.get('/api/blogs/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  if(blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
+  }
+})
+
+blogsRouter.put('/api/blogs/:id', async (request, response) => {
+
+  const body = request.body
+  const existingBlog = await Blog.findById(request.params.id)
+
+  if(!existingBlog) {
+    response.status(404).json({ error: 'Blog not Found' })
+  }
+
+  await Blog.findByIdAndUpdate(
+    request.params.id,
+    {
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes,
+    },
+    { new: true, runValidators: true }
+  )
+
+  const updatedBlog = await Blog.findById(request.params.id)
+  response.status(201).json(updatedBlog)
+
+})
